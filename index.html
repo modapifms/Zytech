@@ -1,187 +1,232 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convertisseur Mosaïques → RAN</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convertisseur normes RAN</title>
 
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --warning: #e67e22;
-            --bg: #f4f7f6;
-        }
+<style>
+:root {
+    --primary:#2c3e50;
+    --accent:#3498db;
+    --success:#27ae60;
+    --warning:#f39c12;
+    --bg:#f4f7f6;
+}
 
-        body {
-            font-family: "Segoe UI", sans-serif;
-            background-color: var(--bg);
-            color: var(--primary);
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
+body {
+    font-family: "Segoe UI", sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
 
-        .app-container {
-            background: white;
-            max-width: 1000px;
-            width: 100%;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            position: relative;
-        }
+.app {
+    background: #fff;
+    max-width: 1050px;
+    width: 100%;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    position: relative;
+}
 
-        h1 {
-            margin-top: 0;
-            font-size: 1.7rem;
-            border-left: 5px solid var(--accent);
-            padding-left: 15px;
-        }
+/* README popover */
+.help {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-        .description {
-            font-size: 1.05rem;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
+.popover {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    width: 360px;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    z-index: 100;
+}
 
-        .editor {
-            width: 100%;
-            min-height: 360px;
-            background: #fff;
-            border: 2px solid #eaeeef;
-            border-radius: 8px;
-            padding: 20px;
-            overflow-y: auto;
-            outline: none;
-            font-size: 15px;
-        }
+.help:hover + .popover,
+.popover:hover {
+    display: block;
+}
 
-        .editor:focus {
-            border-color: var(--accent);
-        }
+h1 {
+    margin-top: 0;
+    border-left: 5px solid var(--accent);
+    padding-left: 15px;
+}
 
-        .status-bar {
-            background: #fff3cd;
-            color: #856404;
-            padding: 12px;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            border-left: 4px solid var(--warning);
-        }
+.editor {
+    min-height: 360px;
+    border: 2px solid #e1e5e8;
+    border-radius: 8px;
+    padding: 20px;
+    outline: none;
+    font-size: 15px;
+}
 
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
+.editor:focus {
+    border-color: var(--accent);
+}
 
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+.notice {
+    margin-top: 15px;
+    background: #fff3cd;
+    padding: 12px;
+    border-left: 4px solid var(--warning);
+    font-size: 0.9rem;
+}
 
-        .btn-main {
-            background-color: var(--accent);
-            color: white;
-        }
+.controls {
+    margin-top: 22px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 
-        .btn-main:hover {
-            background-color: #2980b9;
-        }
+button {
+    padding: 12px 22px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
-        .btn-copy {
-            background-color: var(--success);
-            color: white;
-        }
+.btn-main { background: var(--accent); color: #fff; }
+.btn-copy { background: var(--success); color: #fff; }
+.btn-reset { background: #ecf0f1; }
 
-        .btn-copy:hover {
-            background-color: #219150;
-        }
+.footer {
+    margin-top: 35px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
 
-        .btn-refresh {
-            background-color: #ecf0f1;
-            color: var(--primary);
-        }
-
-        .btn-refresh:hover {
-            background-color: #dfe6e9;
-        }
-    </style>
+.tag {
+    text-decoration: none;
+    font-size: 0.85rem;
+    color: var(--accent);
+    background: #ebf5fb;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+.tag:hover { background: #d6eaf8; }
+</style>
 </head>
 
 <body>
 
-<div class="app-container">
+<div class="app">
 
-    <h1>Convertisseur normes Mosaïques → RAN</h1>
+<div class="help">i</div>
+<div class="popover">
+<strong> README — Normes RAN</strong><br><br>
 
-    <p class="description">
-        Collez vos références <strong>Mosaïques archéologie</strong>.  
-        L’outil supprime automatiquement <em>p.</em> / <em>pp.</em> devant les intervalles de pages
-        (articles, actes), tout en conservant la mise en forme Word.
-    </p>
+Cet outil permet d’adapter des références bibliographiques déjà
+normalisées selon les usages <em>Mosaïques archéologie</em>
+aux normes de la <strong>Revue archéologique de Narbonnaise (RAN)</strong>.<br><br>
 
-    <div id="richEditor" class="editor" contenteditable="true"
-         placeholder="Collez vos références ici…"></div>
+<strong>Règle appliquée :</strong>
+<ul>
+<li>suppression de <em>p.</em> ou <em>pp.</em> devant les intervalles de pages
+des articles et actes (<code>41-59</code>)</li>
+<li>conservation des mentions finales indiquant un nombre total de pages
+(<code>536 p.</code>)</li>
+</ul>
 
-    <div class="status-bar">
-        💡 Astuce : réactualisez la page entre deux séries de conversions.
-    </div>
+La mise en forme (gras, italiques) est conservée.
+</div>
 
-    <div class="controls">
-        <button class="btn-main" onclick="nettoyerVersRAN()">⚡ Convertir vers RAN</button>
-        <button class="btn-copy" onclick="copierResultat()">📋 Copier pour Word</button>
-        <button class="btn-refresh" onclick="location.reload()">🔄 Réinitialiser</button>
-    </div>
+<h1>Convertisseur normes RAN</h1>
+
+<p>
+Collez ci-dessous des références bibliographiques déjà conformes
+aux usages <strong>Mosaïques archéologie</strong> afin de les adapter
+au format <strong>RAN</strong>.
+</p>
+
+<div id="editor" class="editor" contenteditable="true"
+placeholder="Collez vos références ici…"></div>
+
+<div class="notice">
+💡 Seuls les <strong>intervalles de pages</strong> sont modifiés.  
+Les autres mentions de pagination ne sont pas affectées.
+</div>
+
+<div class="controls">
+<button class="btn-main" onclick="convertir()">⚡ Convertir</button>
+<button class="btn-copy" onclick="copier()"> Copier pour Word</button>
+<button class="btn-reset" onclick="location.reload()"> Réinitialiser</button>
+</div>
+
+<div class="footer">
+<a class="tag" href="https://www.asm.cnrs.fr/images/Site/Editions/RAN/RAN-auteurs.pdf" target="_blank">
+📄 Guide des normes RAN
+</a>
+<a class="tag" href="https://www.zotero.org/styles/revue-archeologique-de-narbonnaise" target="_blank">
+📦 Style Zotero CSL RAN
+</a>
+</div>
 
 </div>
 
 <script>
-function nettoyerVersRAN() {
-    const editor = document.getElementById('richEditor');
+function convertir() {
+    const editor = document.getElementById("editor");
     let html = editor.innerHTML;
 
-    /* 1. Normalisation des tirets Word (–, —) → - */
-    html = html.replace(/[–—]/g, '-');
+    /* Normalisation espaces Word */
+    html = html.replace(/&nbsp;|\u00A0|\u202F/g, " ");
 
-    /* 2. Suppression de p. / pp. devant intervalles de pages
-       ex : p. 492-504 → 492-504 */
-    html = html.replace(/\bpp?\.\s*(\d+\s*-\s*\d+)/gi, '$1');
+    /* Normalisation tirets */
+    html = html.replace(/[–—]/g, "-");
+
+    /* Suppression p. / pp. devant intervalles */
+    html = html.replace(
+        /\bpp?\.\s*(\d+\s*-\s*\d+)/gi,
+        "$1"
+    );
 
     editor.innerHTML = html;
 
-    /* Feedback visuel */
-    editor.style.borderColor = '#27ae60';
-    setTimeout(() => {
-        editor.style.borderColor = '#eaeeef';
-    }, 900);
+    editor.style.borderColor = "#27ae60";
+    setTimeout(() => editor.style.borderColor = "#e1e5e8", 900);
 }
 
-function copierResultat() {
-    const editor = document.getElementById('richEditor');
+function copier() {
+    const editor = document.getElementById("editor");
     const range = document.createRange();
     range.selectNodeContents(editor);
     const sel = window.getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-
-    try {
-        document.execCommand('copy');
-        alert("Références copiées avec mise en forme.");
-    } catch (e) {
-        alert("Utilisez Ctrl + C pour copier.");
-    }
-
+    document.execCommand("copy");
     sel.removeAllRanges();
+    alert("Références copiées avec mise en forme.");
 }
 </script>
 
