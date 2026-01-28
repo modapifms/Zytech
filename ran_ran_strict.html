@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur Mosaïques vers RAN</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #e67e22;
+            --bg: #f4f7f6;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            background: white;
+            max-width: 1000px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Style du Pop-over */
+        .help-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            font-style: italic;
+        }
+
+        .popover {
+            display: none;
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            width: 340px;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 100;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .help-icon:hover + .popover, .popover:hover {
+            display: block;
+        }
+
+        h1 { margin-top: 0; font-size: 1.7rem; border-left: 5px solid var(--accent); padding-left: 15px; color: var(--primary); }
+
+        .description { color: #333; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; }
+
+        .editor { 
+            width: 100%; min-height: 380px; background: #fff; border: 2px solid #eaeeef;
+            border-radius: 8px; padding: 20px; overflow-y: auto; box-sizing: border-box;
+            outline: none; font-size: 15px; transition: border-color 0.2s;
+        }
+        .editor:focus { border-color: var(--accent); }
+
+        .status-bar {
+            background: #fff3cd; color: #856404; padding: 12px;
+            border-radius: 6px; margin: 20px 0; font-size: 0.9rem;
+            border-left: 4px solid var(--warning);
+        }
+
+        .controls { display: flex; gap: 12px; margin-top: 25px; flex-wrap: wrap; }
+
+        button { 
+            padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+
+        .btn-main { background-color: var(--accent); color: white; }
+        .btn-main:hover { background-color: #2980b9; transform: translateY(-1px); }
+        .btn-copy { background-color: var(--success); color: white; }
+        .btn-copy:hover { background-color: #219150; transform: translateY(-1px); }
+        .btn-refresh { background-color: #ecf0f1; color: var(--primary); }
+        .btn-refresh:hover { background: #dfe6e9; }
+
+        .footer-links { 
+            margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; 
+            display: flex; justify-content: flex-end; 
+        }
+        
+        .resource-tags { display: flex; gap: 15px; }
+
+        .tag { 
+            text-decoration: none; font-size: 0.85rem; color: var(--accent); 
+            background: #ebf5fb; padding: 6px 14px; border-radius: 20px; 
+            font-weight: 500; transition: background 0.2s;
+        }
+        .tag:hover { background: #d6eaf8; }
+
+        ul { padding-left: 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="help-icon">i</div>
+        <div class="popover">
+            <strong>📖 README - Normes RAN</strong><br><br>
+            Les normes bibliographiques de la <strong>RAN</strong> sont quasi identiques aux normes <strong>Mosaïques archéologie</strong>.
+            <br><br>
+            La différence réside dans la mention de la pagination :
+            <ul>
+                <li><strong>Articles / Actes :</strong> On supprime le "p." ou "pp." devant les pages (ex: 41-49).</li>
+                <li><strong>Ouvrages collectifs / Monographies :</strong> On conserve la mention finale (ex: 536 p.).</li>
+            </ul>
+        </div>
+
+        <h1>Convertisseur Normes RAN</h1>
+        <p class="description">
+            Collez vos références bibliographiques <strong>Mosaïques archéologie</strong> pour supprimer les <strong>p.</strong> ou <strong>pp.</strong> devant les intervalles de pages.
+        </p>
+
+        <div id="richEditor" class="editor" contenteditable="true" placeholder="Collez vos références ici (Gras et Italiques conservés)..."></div>
+        
+        <div class="status-bar">
+            <span><strong>💡 Rappel :</strong> Réactualisez la page entre chaque nouvelle conversion afin d'éviter les erreurs de cumul.</span>
+        </div>
+
+        <div class="controls">
+            <button class="btn-main" onclick="nettoyerVersRAN()">⚡ Convertir vers RAN</button>
+            <button class="btn-copy" onclick="copierResultat()">📋 Copier pour Word</button>
+            <button class="btn-refresh" onclick="location.reload()">🔄 Réactualiser la page</button>
+        </div>
+
+        <div class="footer-links">
+            <div class="resource-tags">
+                <a href="https://www.asm.cnrs.fr/images/Site/Editions/RAN/RAN-auteurs.pdf" target="_blank" class="tag">📄 Guide des normes RAN (PDF)</a>
+                <a href="https://www.zotero.org/styles/revue-archeologique-de-narbonnaise" target="_blank" class="tag">📦 Style Zotero RAN (.csl)</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function nettoyerVersRAN() {
+            const editor = document.getElementById('richEditor');
+            let htmlContent = editor.innerHTML;
+            
+            // 1. Suppression p./pp. devant intervalles (ex: p. 41-49)
+            htmlContent = htmlContent.replace(/(pp?\.\s?)(\d+[\–\-]\d+)/g, '$2');
+            
+            // 2. Harmonisation des tirets (Word -> Standard)
+            htmlContent = htmlContent.replace(/\–/g, '-');
+            
+            editor.innerHTML = htmlContent;
+            
+            // Feedback visuel de succès
+            editor.style.borderColor = '#27ae60';
+            setTimeout(() => { editor.style.borderColor = '#eaeeef'; }, 1000);
+        }
+
+        function copierResultat() {
+            const editor = document.getElementById('richEditor');
+            const range = document.createRange();
+            range.selectNode(editor);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            
+            try {
+                document.execCommand('copy');
+                alert("Texte converti et formaté copié !");
+            } catch (err) {
+                alert("Utilisez Ctrl+C pour copier.");
+            }
+            window.getSelection().removeAllRanges();
+        }
+    </script>
+</body>
+</html>
